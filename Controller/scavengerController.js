@@ -1,4 +1,4 @@
-import { User as userModel } from "../Model/userModel.js";
+import { scavengerModel } from "../Model/scavengerModel.js";
 async function getAllScavenger(req, res, next) {
   // to do
 }
@@ -10,7 +10,26 @@ async function updateScavenger(req, res, next) {
   // to do
 }
 async function createScavenger(req, res, next) {
-  // to do
+  try {
+    const { scavengerName, description, startLocation, scavengerStops } =
+      req.body;
+    const hunt = await scavengerModel.create({
+      scavengerName,
+      description,
+      startLocation,
+      scavengerStops,
+    });
+    res.status(200).json({
+      status: "success",
+      data: {
+        hunt,
+      },
+    });
+  } catch (error) {
+    const err = error;
+    err.statusCode = 404;
+    next(err);
+  }
 }
 async function deleteScavenger(req, res, next) {
   // to do

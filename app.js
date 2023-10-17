@@ -1,5 +1,6 @@
 import express from "express";
 import { userRouter } from "./Routes/userRoutes.js";
+import { scavengerRouter } from "./Routes/scavengerRoutes.js";
 const app = express();
 
 // Global middleware
@@ -7,6 +8,7 @@ app.use(express.json());
 
 // Parent routes
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/scavengerHunt", scavengerRouter);
 
 // unhandled routes
 app.all("*", (req, res, next) => {

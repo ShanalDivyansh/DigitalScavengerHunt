@@ -8,7 +8,7 @@ async function getAllUsers(req, res, next) {
       data: { users },
     });
   } catch (error) {
-    const err = new Error(`No users found`);
+    const err = error;
     err.statusCode = 404;
     next(err);
   }
@@ -22,7 +22,7 @@ async function getUser(req, res, next) {
       data: { users },
     });
   } catch (error) {
-    const err = new Error(`No users found`);
+    const err = error;
     err.statusCode = 404;
     next(err);
   }
@@ -40,7 +40,7 @@ async function updateUser(req, res, next) {
       data: { users },
     });
   } catch (error) {
-    const err = new Error(`No users found`);
+    const err = error;
     err.statusCode = 404;
     next(err);
   }
@@ -53,7 +53,7 @@ async function deleteUser(req, res, next) {
       data: null,
     });
   } catch (error) {
-    const err = new Error(`Fail`);
+    const err = error;
     err.statusCode = 404;
     next(err);
   }

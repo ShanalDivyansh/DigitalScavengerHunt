@@ -10,11 +10,12 @@ import {
 const scavengerRouter = express.Router();
 scavengerRouter
   .route("/")
-  .get([auth.protect, auth.restrictTo("user", "admin")], getAllScavenger);
+  .get([auth.protect, auth.restrictTo("user", "admin")], getAllScavenger)
+  .post([auth.protect, auth.restrictTo("admin")], createScavenger);
 
 scavengerRouter
   .route("/:id")
   .get([auth.protect, auth.restrictTo("user", "admin")], getScavenger)
-  .post([auth.protect, auth.restrictTo("admin")], createScavenger)
   .patch([auth.protect, auth.restrictTo("admin")], updateScavenger)
   .delete([auth.protect, auth.restrictTo("admin")], deleteScavenger);
+export { scavengerRouter };

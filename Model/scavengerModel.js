@@ -33,5 +33,5 @@ const scavengerSchema = new mongoose.Schema({
     },
   ],
 });
-const scavengerModel = mongoose.model("Users", scavengerSchema);
+const scavengerModel = mongoose.model("ScavengerHunt", scavengerSchema);
 export { scavengerModel };
