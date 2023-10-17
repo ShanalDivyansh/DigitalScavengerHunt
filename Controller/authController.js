@@ -2,7 +2,7 @@ import { User as userModel } from "../Model/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { promisify } from "util";
-async function signUp(req, res) {
+async function signUp(req, res, next) {
   try {
     const { userName, email, password, passwordConfirm } = req.body;
 
@@ -29,14 +29,14 @@ async function signUp(req, res) {
     });
   }
 }
-async function logIn(req, res) {
+async function logIn(req, res, next) {
   try {
     const { userName, password: passwordProvided } = req.body;
     if (userName === undefined && passwordProvided === undefined) {
       // todo throw error if no password or username is given
       const err = new Error(`Error: no password or username is given`);
       err.statusCode = 401;
-      next(err);
+      return next(err);
     }
     const user = await userModel
       .findOne({ userName: userName })
@@ -45,14 +45,14 @@ async function logIn(req, res) {
       // to do throw error
       const err = new Error(`Error: no user found`);
       err.statusCode = 404;
-      next(err);
+      return next(err);
     }
     const correctPass = await bcrypt.compare(passwordProvided, user.password);
     if (!correctPass) {
       // to do throw error
-      const err = new Error(`Error: no password or username is given`);
+      const err = new Error(`Error: password or username is incorrect.`);
       err.statusCode = 401;
-      next(err);
+      return next(err);
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(201).json({
@@ -76,7 +76,7 @@ async function protect(req, res, next) {
       // throw error
       const err = new Error(`Error: no password or username is given`);
       err.statusCode = 401;
-      next(err);
+      return next(err);
     }
     const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
     const user = await userModel.findById(decode.id);
@@ -84,13 +84,13 @@ async function protect(req, res, next) {
       // throw error
       const err = new Error(`Error: no password or username is given`);
       err.statusCode = 401;
-      next(err);
+      return next(err);
     }
     if (user.changedPasswordAfter(decode.iat)) {
       // throw an error
       const err = new Error(`Error: no password or username is given`);
       err.statusCode = 401;
-      next(err);
+      return next(err);
     }
     req.user = user;
     next();
@@ -106,7 +106,7 @@ async function restrictTo(...roles) {
         `Error: user does not have access rights to the content`
       );
       err.statusCode = 403;
-      next(err);
+      return next(err);
     }
     next();
   };
