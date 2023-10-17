@@ -102,8 +102,6 @@ async function protect(req, res, next) {
 function restrictTo(...roles) {
   console.log(roles);
   return function (req, res, next) {
-    console.log(req.user.role);
-
     if (!roles.includes(req.user.role)) {
       // throw an error
       const err = new Error(
