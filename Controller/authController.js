@@ -4,13 +4,14 @@ import bcrypt from "bcrypt";
 import { promisify } from "util";
 async function signUp(req, res, next) {
   try {
-    const { userName, email, password, passwordConfirm } = req.body;
+    const { userName, email, password, passwordConfirm, role } = req.body;
 
     const user = await userModel.create({
       userName,
       email,
       password,
       passwordConfirm,
+      role,
     });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(201).json({
@@ -98,8 +99,11 @@ async function protect(req, res, next) {
     console.log(error);
   }
 }
-async function restrictTo(...roles) {
+function restrictTo(...roles) {
+  console.log(roles);
   return function (req, res, next) {
+    console.log(req.user.role);
+
     if (!roles.includes(req.user.role)) {
       // throw an error
       const err = new Error(
