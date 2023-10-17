@@ -34,16 +34,25 @@ async function logIn(req, res) {
     const { userName, password: passwordProvided } = req.body;
     if (userName === undefined && passwordProvided === undefined) {
       // todo throw error if no password or username is given
+      const err = new Error(`Error: no password or username is given`);
+      err.statusCode = 401;
+      next(err);
     }
     const user = await userModel
       .findOne({ userName: userName })
       .select("+password");
     if (!user) {
       // to do throw error
+      const err = new Error(`Error: no user found`);
+      err.statusCode = 404;
+      next(err);
     }
     const correctPass = await bcrypt.compare(passwordProvided, user.password);
     if (!correctPass) {
       // to do throw error
+      const err = new Error(`Error: no password or username is given`);
+      err.statusCode = 401;
+      next(err);
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(201).json({
@@ -65,14 +74,23 @@ async function protect(req, res, next) {
     }
     if (!token) {
       // throw error
+      const err = new Error(`Error: no password or username is given`);
+      err.statusCode = 401;
+      next(err);
     }
     const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
     const user = await userModel.findById(decode.id);
     if (!user) {
       // throw error
+      const err = new Error(`Error: no password or username is given`);
+      err.statusCode = 401;
+      next(err);
     }
     if (user.changedPasswordAfter(decode.iat)) {
       // throw an error
+      const err = new Error(`Error: no password or username is given`);
+      err.statusCode = 401;
+      next(err);
     }
     req.user = user;
     next();
@@ -84,7 +102,11 @@ async function restrictTo(...roles) {
   return function (req, res, next) {
     if (!roles.includes(req.user.role)) {
       // throw an error
-      // return next(err)
+      const err = new Error(
+        `Error: user does not have access rights to the content`
+      );
+      err.statusCode = 403;
+      next(err);
     }
     next();
   };
