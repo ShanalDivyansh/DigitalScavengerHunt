@@ -3,12 +3,13 @@ import LoginSignupButton from "./components/LoginSignupButton";
 import LoginForm from "./LoginForm";
 import "./App.css";
 import Modal from "./components/Modal";
+import SignupForm from "./SignupForm";
 
-const LandingPage = ({ onLogin }) => {
+const LandingPage = ({ onLogin , onSignup,setModalOpen}) => {
   const [loginformShow, setLoginFormShow] = useState(false);
   const [signUpFormShow, signUpSetFormShow] = useState(false);
   return (
-    <div className="container">
+    <div className={`container`}>
       <h1 className="title">Scavenger Hunt</h1>
       <h2 className="subTitle">
         Unlock the Town Mysteries Scavenge, Solve, Succeed!
@@ -21,10 +22,17 @@ const LandingPage = ({ onLogin }) => {
         />
       </div>
       {loginformShow && (
-        <Modal>
+        <Modal >
           <LoginForm onLogin={onLogin} />
         </Modal>
       )}
+      {
+        signUpFormShow && (
+          <Modal>
+            <SignupForm onSignup={onSignup} onLogin={onLogin}/>
+          </Modal>
+        )
+      }
       <img className="landingImg" src="src\assets\landingPageImage.png" />
       {/* {loginformShow && <LoginForm />} */}
       {/* {formShow && <Form />} */}

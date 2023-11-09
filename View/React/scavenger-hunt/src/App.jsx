@@ -3,16 +3,19 @@ import LandingPage from "./landingPage";
 import Map from "./Map";
 const App = () => {
   const [isValidLogin, setValidLogin] = useState(false);
-  console.log(isValidLogin);
+  const [isValidSignUp, setValidSignup] = useState(false);
+
   function handleLogin() {
     setValidLogin(true);
   }
-  console.log(isValidLogin);
+  function handleSignup() {
+    setValidSignup(true);
+  }
+
+  if(isValidLogin || isValidSignUp){
+    return    <Map />
+  }
   return (
-    <>
-      {!isValidLogin && <LandingPage onLogin={handleLogin} />}
-      {isValidLogin && <Map />}
-    </>
-  );
+<LandingPage onLogin={handleLogin} onSignup = {handleSignup}/>  );
 };
 export default App;
