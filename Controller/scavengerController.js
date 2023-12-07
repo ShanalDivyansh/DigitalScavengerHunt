@@ -1,7 +1,20 @@
 import { scavengerModel } from "../Model/scavengerModel.js";
-async function getAllScavenger(req, res, next) {
+
+const handleNotFound = (scavengerId) => {
+  const err = new Error(`Scavenger hunt with ID ${scavengerId} not found`);
+  err.statusCode = 404;
+  throw err;
+};
+
+const handleInvalidId = (scavengerId) => {
+  const err = new Error(`Invalid ID format: ${scavengerId}`);
+  err.statusCode = 400;
+  throw err;
+};
+
+const getAllScavenger = async (req, res, next) => {
   try {
-    const hunts = await scavengerModel.find();
+    const hunts = await scavengerModel.find(req.query);
     res.status(200).json({
       status: "success",
       data: {
@@ -13,16 +26,14 @@ async function getAllScavenger(req, res, next) {
     err.statusCode = 404;
     next(err);
   }
-}
-async function getScavenger(req, res, next) {
+};
+
+const getScavenger = async (req, res, next) => {
   try {
     const scavengerId = req.params.id;
     const hunt = await scavengerModel.findById(scavengerId);
-
     if (!hunt) {
-      const err = new Error(`Scavenger hunt with ID ${scavengerId} not found`);
-      err.statusCode = 404;
-      throw err;
+      handleNotFound(scavengerId);
     }
 
     res.status(200).json({
@@ -34,14 +45,13 @@ async function getScavenger(req, res, next) {
   } catch (error) {
     const err = error;
     if (err.kind === "ObjectId") {
-      err.statusCode = 400;
-      err.message = `Invalid ID format: ${scavengerId}`;
+      handleInvalidId(scavengerId);
     }
     next(err);
   }
-}
+};
 
-async function updateScavenger(req, res, next) {
+const updateScavenger = async (req, res, next) => {
   try {
     const scavengerId = req.params.id;
     const updatedData = req.body;
@@ -56,9 +66,7 @@ async function updateScavenger(req, res, next) {
     );
 
     if (!hunt) {
-      const err = new Error(`Scavenger hunt with ID ${scavengerId} not found`);
-      err.statusCode = 404;
-      throw err;
+      handleNotFound(scavengerId);
     }
 
     res.status(200).json({
@@ -70,22 +78,25 @@ async function updateScavenger(req, res, next) {
   } catch (error) {
     const err = error;
     if (err.kind === "ObjectId") {
-      err.statusCode = 400;
-      err.message = `Invalid ID format: ${scavengerId}`;
+      handleInvalidId(scavengerId);
     }
     next(err);
   }
-}
-async function createScavenger(req, res, next) {
+};
+
+const createScavenger = async (req, res, next) => {
   try {
-    const { scavengerName, description, startLocation, scavengerStops } =
+    const { scavengerName, description, startLocation, scavengerStops, topic } =
       req.body;
+
     const hunt = await scavengerModel.create({
       scavengerName,
       description,
       startLocation,
       scavengerStops,
+      topic,
     });
+
     res.status(200).json({
       status: "success",
       data: {
@@ -97,16 +108,15 @@ async function createScavenger(req, res, next) {
     err.statusCode = 404;
     next(err);
   }
-}
-async function deleteScavenger(req, res, next) {
+};
+
+const deleteScavenger = async (req, res, next) => {
   try {
     const scavengerId = req.params.id;
     const hunt = await scavengerModel.findByIdAndDelete(scavengerId);
 
     if (!hunt) {
-      const err = new Error(`Scavenger hunt with ID ${scavengerId} not found`);
-      err.statusCode = 404;
-      throw err;
+      handleNotFound(scavengerId);
     }
 
     res.status(200).json({
@@ -116,12 +126,12 @@ async function deleteScavenger(req, res, next) {
   } catch (error) {
     const err = error;
     if (err.kind === "ObjectId") {
-      err.statusCode = 400;
-      err.message = `Invalid ID format: ${scavengerId}`;
+      handleInvalidId(scavengerId);
     }
     next(err);
   }
-}
+};
+
 export {
   getAllScavenger,
   getScavenger,

@@ -14,8 +14,8 @@ userRouter
   .get([auth.protect, auth.restrictTo("admin")], getAllUsers);
 userRouter
   .route("/:id")
-  .get([auth.protect, auth.restrictTo("admin")], getUser)
-  .patch([auth.protect, auth.restrictTo("admin")], updateUser)
+  .get([auth.protect, auth.restrictTo("admin", "user")], getUser)
+  .patch([auth.protect, auth.restrictTo("admin", "user")], updateUser)
   .delete([auth.protect, auth.restrictTo("admin")], deleteUser);
 
 userRouter.route("/forgotPassword").post(auth.forgotPassword);

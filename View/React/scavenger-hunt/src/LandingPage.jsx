@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LoginSignupButton from "./components/LoginSignupButton";
 import LoginForm from "./LoginForm";
 import "./App.css";
 import Modal from "./components/Modal";
 import SignupForm from "./SignupForm";
 
-const LandingPage = ({ onLogin , onSignup,setModalOpen}) => {
+const LandingPage = ({ onForgotPassword, onResetPassword, loggedIn }) => {
   const [loginformShow, setLoginFormShow] = useState(false);
   const [signUpFormShow, signUpSetFormShow] = useState(false);
+
   return (
     <div className={`container`}>
       <h1 className="title">Scavenger Hunt</h1>
@@ -15,27 +16,38 @@ const LandingPage = ({ onLogin , onSignup,setModalOpen}) => {
         Unlock the Town Mysteries Scavenge, Solve, Succeed!
       </h2>
       <div className="login_signup">
-        <LoginSignupButton btnText={"Log In"} clickHandler={setLoginFormShow} />
+        <LoginSignupButton
+          btnText={"Log In"}
+          clickHandler={setLoginFormShow}
+          singUpClickHandler={signUpSetFormShow}
+          isSignupOpen={signUpFormShow}
+        />
         <LoginSignupButton
           btnText={"Sign Up"}
           clickHandler={signUpSetFormShow}
+          loginClickHandler={setLoginFormShow}
+          isLoginOpen={loginformShow}
         />
       </div>
       {loginformShow && (
-        <Modal >
-          <LoginForm onLogin={onLogin} />
+        <Modal close={setLoginFormShow} escape={true}>
+          <LoginForm
+            loggedIn={loggedIn}
+            onForgotPassword={onForgotPassword}
+            onResetPassword={onResetPassword}
+          />
         </Modal>
       )}
-      {
-        signUpFormShow && (
-          <Modal>
-            <SignupForm onSignup={onSignup} onLogin={onLogin}/>
-          </Modal>
-        )
-      }
-      <img className="landingImg" src="src\assets\landingPageImage.png" />
-      {/* {loginformShow && <LoginForm />} */}
-      {/* {formShow && <Form />} */}
+      {signUpFormShow && (
+        <Modal close={signUpSetFormShow} escape={true}>
+          <SignupForm loggedIn={loggedIn} />
+        </Modal>
+      )}
+      <img
+        className="landingImg"
+        alt="landing image of a mystery game"
+        src="src\assets\landingPageImage.png"
+      />
     </div>
   );
 };

@@ -1,11 +1,19 @@
 import "./button.css";
-const LoginSignupButton = ({ btnText, clickHandler ,setModalOpen}) => {
+const LoginSignupButton = ({
+  btnText,
+  clickHandler,
+  singUpClickHandler,
+  isSignupOpen,
+  loginClickHandler,
+  isLoginOpen,
+}) => {
   return (
     <>
       <button
         onClick={() => {
           clickHandler((s) => !s);
-          // setModalOpen((s)=>!s)
+          isLoginOpen && loginClickHandler((s) => !s);
+          isSignupOpen && singUpClickHandler((s) => !s);
         }}
       >
         {btnText}

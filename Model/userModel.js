@@ -30,12 +30,40 @@ const userSchema = new mongoose.Schema({
     },
   },
   role: { type: String, enum: ["user", "admin"], default: "user" },
-  rewardsCollected: Object,
-  scavengerHuntsCompleted: String,
-  rewardsRedeemed: Object,
+
+  scavengerIntrests: [
+    {
+      type: String,
+      required: [true, "A user must have some intrests"],
+      enum: ["Time-Travelers", "Famous-Figures", "Time-Period", "general"],
+      default: "general",
+    },
+  ],
+  scavengerIntrestsId: [
+    {
+      type: mongoose.Schema.ObjectId,
+      // ref: "ScavengerHunt",
+    },
+  ],
+  scavengerHuntsCompleted: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "ScavengerHunt",
+    },
+  ],
+  currentScavengerHunt: {
+    type: mongoose.Schema.ObjectId,
+    ref: "ScavengerHunt",
+  },
+  rewardsCollected: {
+    type: Number,
+    default: 0,
+    min: [0, "min rewards are 0"],
+    max: [100, "max rewards are below 100"],
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetTokenExpire: Date
+  passwordResetTokenExpire: Date,
 });
 
 // encrypt the password
@@ -58,14 +86,16 @@ userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
 };
 
 userSchema.methods.createResetPasswordToken = function () {
-  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetToken = crypto.randomBytes(32).toString("hex");
   //encryption
-  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.passwordResetTokenExpire = Date.now()+ 10*60*1000;//10 min
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetTokenExpire = Date.now() + 10 * 60 * 1000; //10 min
   //console.log(resetToken,this.passwordResetToken);
-  
-  return resetToken;
 
-}
+  return resetToken;
+};
 const User = mongoose.model("Users", userSchema);
 export { User };

@@ -15,7 +15,9 @@ async function getAllUsers(req, res, next) {
 }
 async function getUser(req, res, next) {
   try {
-    const users = await userModel.findById(req.params.id);
+    const users = await userModel
+      .findById(req.params.id)
+      .populate("currentScavengerHunt");
     res.status(200).json({
       status: "success",
       results: users.length,
@@ -28,7 +30,6 @@ async function getUser(req, res, next) {
   }
 }
 async function updateUser(req, res, next) {
-  // to do
   try {
     const users = await userModel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,

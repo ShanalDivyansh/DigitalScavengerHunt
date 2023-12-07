@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const SignupForm = ({ onSignup, onLogin }) => {
+const SignupForm = ({ loggedIn }) => {
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
@@ -10,7 +10,6 @@ const SignupForm = ({ onSignup, onLogin }) => {
   });
 
   const [errors, setErrors] = useState({});
-  const [submit, setSubmit] = useState(false);
 
   function changeHandler(e) {
     const { name, value } = e.target;
@@ -45,25 +44,39 @@ const SignupForm = ({ onSignup, onLogin }) => {
     return Object.keys(errors).length === 0;
   }
 
-  useEffect(() => {
-    if (submit && validateForm()) {
-      (async () => {
-        const response = await axios.post(
-          "http://127.0.0.1:3000/api/v1/users/signup",
-          formData
-        );
-        console.log(response.data);
-        if (response.data.status === "success") {
-          onSignup();
-          onLogin();
-        }
-      })();
-    }
-  }, [submit]);
-
   async function handleSubmit(e) {
     e.preventDefault();
-    setSubmit((c) => !c);
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:3000/api/v1/users/signup",
+        formData
+      );
+      if (response.data.status === "success") {
+        const headers = {
+          Authorization: `Bearer ${response.data.token}`,
+          "Content-Type": "application/json",
+        };
+        const userDetails = await axios.get(
+          `http://127.0.0.1:3000/api/v1/users/${response.data.data.user._id}`,
+          {
+            headers,
+          }
+        );
+        loggedIn({
+          type: "loggedIn",
+          payload: {
+            newUser: true,
+            userName: userDetails.data.data.users.userName,
+            scavengerIntrests: userDetails.data.data.users.scavengerIntrests,
+            rewardsCollected: userDetails.data.data.users.rewardsCollected,
+            userToken: response.data.token,
+            id: response.data.data.user._id,
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -74,12 +87,10 @@ const SignupForm = ({ onSignup, onLogin }) => {
         type="text"
         id="userName"
         name="userName"
-        // placeholder="Username"
         value={formData.userName}
         onChange={(e) => {
           changeHandler(e);
         }}
-        // className="form-input"
       />
       {errors.userName && (
         <span className="error-message">{errors.userName}</span>
@@ -90,12 +101,10 @@ const SignupForm = ({ onSignup, onLogin }) => {
         type="text"
         id="email"
         name="email"
-        // placeholder="Email"
         value={formData.email}
         onChange={(e) => {
           changeHandler(e);
         }}
-        // className="form-input"
       />
       {errors.email && <span className="error-message">{errors.email}</span>}
       <label id="password">Password</label>
@@ -104,12 +113,10 @@ const SignupForm = ({ onSignup, onLogin }) => {
         type="password"
         id="password"
         name="password"
-        // placeholder="Password"
         value={formData.password}
         onChange={(e) => {
           changeHandler(e);
         }}
-        // className="form-input"
       />
       {errors.password && (
         <span className="error-message">{errors.password}</span>
@@ -119,7 +126,6 @@ const SignupForm = ({ onSignup, onLogin }) => {
         type="password"
         id="passwordConfirm"
         name="passwordConfirm"
-        // placeholder="Confirm Password"
         value={formData.passwordConfirm}
         onChange={(e) => {
           changeHandler(e);
